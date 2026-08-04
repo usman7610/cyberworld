@@ -521,7 +521,7 @@
     </div>
 
     <div class="mobile-tab-bar" id="mobile-tab-bar"></div>
-    <div class="swipe-hint">↔️ Swipe or drag to switch pages</div>
+   // <div class="swipe-hint">↔️ Swipe or drag to switch pages</div>
 
     <main class="site-main">
       <section id="home" class="section">
@@ -957,9 +957,9 @@
       contactTitle: 'Contact',
       contactFormTitle: 'Contact Us',
       contactText: 'Reach out to our team for consultations and cybersecurity services.',
-      publicEmail: 'info@example.com',
-      publicPhone: '+92 300 1234567',
-      publicAddress: '123 Business Street, City',
+      publicEmail: 'usman7610@outlook.com',
+      publicPhone: '+92 314 5587554',
+      publicAddress: 'Nanjing City Jiangsu District China',
       contactImage: '',
       blogTitle: 'Blog',
       blogSubtitle: 'Latest updates managed from the admin panel.',
@@ -1029,8 +1029,8 @@
     async function ensureDefaultAdmin() {
       let auth = load(STORAGE_KEYS.auth, null);
       if (auth && auth.email && auth.passwordHash) return;
-      const passwordHash = await hashPassword('password123');
-      save(STORAGE_KEYS.auth, { email: 'admin@example.com', passwordHash, role: 'super_admin' });
+      const passwordHash = await hashPassword('123');
+      save(STORAGE_KEYS.auth, { email: 'usman', passwordHash, role: 'super_admin' });
     }
 
     function loadAllData() {
