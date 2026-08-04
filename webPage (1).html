@@ -1,0 +1,2216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CyberShield Pro - Advanced Admin Panel</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary: #00d9ff;
+      --secondary: #ff006e;
+      --accent: #8338ec;
+      --bg: #070c26;
+      --bg-soft: #111835;
+      --card: #171d3d;
+      --border: #2d3561;
+      --text: #e8eefb;
+      --muted: #a8b5d0;
+      --danger: #cf3b5d;
+      --success: #1cc97b;
+      --radius: 16px;
+    }
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body { overflow-x: hidden; }
+    .hidden { display: none !important; }
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; }
+
+    header.site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.5rem;
+      background: rgba(7,12,38,.96);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(10px);
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: .9rem;
+      text-decoration: none;
+      color: var(--primary);
+      font-weight: 800;
+      min-width: 0;
+    }
+    .logo-icon {
+      width: 56px;
+      height: 56px;
+      display: grid;
+      place-items: center;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #35d6ff, #ff1878);
+      color: white;
+      font-size: 1.4rem;
+      box-shadow: 0 0 28px rgba(0,217,255,.2);
+      flex-shrink: 0;
+    }
+    .logo span { font-size: clamp(1.5rem, 3vw, 2.05rem); }
+
+    .desktop-nav {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: .7rem;
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+    .desktop-nav button,
+    .mobile-nav button,
+    .mobile-tab-bar button {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid transparent;
+      padding: .8rem 1.1rem;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+    .desktop-nav button:hover,
+    .desktop-nav button.active,
+    .mobile-nav button:hover,
+    .mobile-nav button.active,
+    .mobile-tab-bar button.active {
+      color: var(--primary);
+      background: rgba(0,217,255,.1);
+      border-color: rgba(0,217,255,.32);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      justify-content: flex-end;
+    }
+    .btn-primary, .btn-secondary, .btn-danger, .btn-ghost {
+      border-radius: 12px;
+      padding: .95rem 1.2rem;
+      font-weight: 700;
+      border: none;
+    }
+    .btn-primary { background: linear-gradient(135deg, var(--primary), #2aaeff); color: #00101b; }
+    .btn-secondary { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+    .btn-danger { background: linear-gradient(135deg, #9c1936, var(--danger)); color: white; }
+    .btn-ghost { background: rgba(255,255,255,.05); color: white; border: 1px solid var(--border); }
+
+    .menu-toggle {
+      display: none;
+      background: rgba(255,255,255,.05);
+      color: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: .8rem 1rem;
+    }
+
+    .mobile-nav-panel {
+      display: none;
+      border-bottom: 1px solid var(--border);
+      background: rgba(7,12,38,.98);
+      padding: .9rem 1rem 1rem;
+    }
+    .mobile-nav-panel.open { display: block; }
+    .mobile-nav {
+      display: flex;
+      flex-direction: column;
+      gap: .45rem;
+    }
+    .mobile-nav button { width: 100%; text-align: left; }
+
+    .mobile-tab-bar {
+      display: none;
+      gap: .6rem;
+      overflow-x: auto;
+      padding: .8rem 1rem;
+      border-bottom: 1px solid var(--border);
+      background: rgba(7,12,38,.98);
+    }
+    .mobile-tab-bar button {
+      white-space: nowrap;
+      flex: 0 0 auto;
+      border: 1px solid rgba(0,217,255,.2);
+      border-radius: 999px;
+    }
+
+    main.site-main {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+    .hero {
+      border-radius: 28px;
+      padding: 4rem 2rem;
+      background: linear-gradient(135deg, #1d2e60, #0c1234 60%, #3b1f6f);
+      border: 1px solid rgba(255,255,255,.08);
+      margin-bottom: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero h1 {
+      font-size: clamp(2.3rem, 7vw, 5rem);
+      line-height: 1.02;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--primary), #9fd0ff 60%, #da73ca);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p { font-size: clamp(1rem, 2vw, 1.35rem); color: #c7d1ea; max-width: 980px; line-height: 1.7; }
+    .hero-buttons { display: flex; gap: .9rem; margin-top: 1.4rem; flex-wrap: wrap; }
+    .hero-image {
+      width: 100%;
+      max-height: 320px;
+      object-fit: cover;
+      border-radius: 18px;
+      margin-top: 1.25rem;
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .section-title {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .section-subtitle { color: var(--muted); margin-bottom: 1rem; }
+    .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+
+    .card, .panel {
+      background: linear-gradient(180deg, rgba(23,29,61,.98), rgba(13,18,45,.98));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.2rem;
+      box-shadow: 0 16px 28px rgba(0,0,0,.18);
+    }
+    .card h3 { color: var(--primary); margin-bottom: .7rem; }
+    .card p { color: var(--muted); line-height: 1.7; }
+    .card-icon { font-size: 2.3rem; margin-bottom: .9rem; }
+
+    .service-image,
+    .blog-image,
+    .page-image,
+    .content-image,
+    .team-photo,
+    .client-logo {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      display: block;
+      border-radius: 14px;
+      margin-bottom: 1rem;
+      border: 1px solid rgba(255,255,255,.08);
+      background: #0f1534;
+    }
+    .team-photo-placeholder,
+    .client-logo-placeholder {
+      width: 100%;
+      height: 220px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      margin-bottom: 1rem;
+      border: 1px dashed rgba(0,217,255,.28);
+      background: rgba(0,217,255,.05);
+      font-size: 3rem;
+    }
+
+    .form-container, .admin-form-card { padding: 1.25rem; }
+    .form-title, .admin-form-title {
+      color: var(--primary);
+      font-size: 1.35rem;
+      font-weight: 800;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: .85rem;
+      margin-bottom: 1rem;
+    }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-weight: 700; margin-bottom: .45rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%;
+      padding: .95rem 1rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #0d1433;
+      color: white;
+      outline: none;
+    }
+    .form-group textarea { min-height: 120px; resize: vertical; }
+
+    .notification-wrap {
+      position: fixed;
+      right: 1rem;
+      top: 1rem;
+      z-index: 500;
+      display: flex;
+      flex-direction: column;
+      gap: .65rem;
+      width: min(92vw, 380px);
+    }
+    .notification {
+      border-radius: 14px;
+      padding: .95rem 1rem;
+      border: 1px solid var(--border);
+      background: #101633;
+    }
+    .notification.success { border-color: rgba(28,201,123,.4); }
+    .notification.error { border-color: rgba(207,59,93,.4); }
+    .notification.info { border-color: rgba(0,217,255,.32); }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(3,6,18,.82);
+      z-index: 400;
+      padding: 1rem;
+    }
+    .modal.active { display: flex; }
+    .modal-content {
+      width: min(100%, 520px);
+      background: #101633;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 1.4rem;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      color: var(--primary);
+      font-size: 1.25rem;
+      font-weight: 800;
+    }
+    .modal-close { background: transparent; border: none; color: white; font-size: 1.3rem; }
+
+    .media-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px,1fr));
+      gap: 1rem;
+    }
+    .media-item {
+      background: #0e1432;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+    }
+    .media-item img { width: 100%; height: 200px; object-fit: cover; display: block; }
+    .media-meta { padding: .85rem; color: var(--muted); }
+    .media-delete { position: absolute; top: .55rem; right: .55rem; }
+    .upload-area {
+      border: 2px dashed rgba(0,217,255,.35);
+      border-radius: 16px;
+      padding: 1.35rem;
+      text-align: center;
+      background: rgba(0,217,255,.05);
+    }
+
+    .swipe-hint {
+      position: fixed;
+      right: 20px;
+      bottom: 24px;
+      background: rgba(8,18,52,.88);
+      color: var(--primary);
+      border: 1px solid rgba(0,217,255,.28);
+      padding: .85rem 1.15rem;
+      border-radius: 999px;
+      z-index: 60;
+      pointer-events: none;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 14px 28px rgba(0,0,0,.22);
+      max-width: min(420px, calc(100vw - 32px));
+      font-weight: 600;
+    }
+
+    #admin-mode { display: none; min-height: 100vh; }
+    .admin-wrapper {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      min-height: 100vh;
+    }
+    .admin-sidebar {
+      background: linear-gradient(180deg, #131833, #0b1028);
+      border-right: 1px solid var(--border);
+      padding: 1rem;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    .admin-brand {
+      display: flex;
+      gap: .8rem;
+      align-items: center;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1rem;
+    }
+    .admin-nav { display: grid; gap: .35rem; }
+    .admin-nav-link {
+      text-align: left;
+      padding: .95rem 1rem;
+      border-radius: 12px;
+      background: transparent;
+      color: white;
+      border: 1px solid transparent;
+    }
+    .admin-nav-link.active, .admin-nav-link:hover {
+      color: var(--primary);
+      background: rgba(0,217,255,.08);
+      border-color: rgba(0,217,255,.22);
+    }
+    .admin-main {
+      min-width: 0;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .admin-header-bar {
+      position: sticky;
+      top: 0;
+      z-index: 80;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      background: rgba(7,12,38,.96);
+    }
+    .admin-content {
+      padding: 1.25rem;
+      flex: 1;
+      overflow-y: auto;
+      min-height: 0;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .stat-card {
+      background: linear-gradient(135deg, rgba(0,217,255,.08), rgba(131,56,236,.08));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1rem;
+    }
+    .stat-number { font-size: 2rem; color: var(--primary); font-weight: 900; }
+
+    .table-container {
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: #121938;
+    }
+    .table-scroll { overflow-x: auto; }
+    table {
+      width: 100%;
+      min-width: 760px;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: .95rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    th { color: var(--primary); background: rgba(255,255,255,.03); }
+
+    .action-row { display: flex; gap: .5rem; flex-wrap: wrap; }
+    .action-btn {
+      background: rgba(255,255,255,.05);
+      color: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .55rem .8rem;
+    }
+    .action-btn.edit { color: #d5c4ff; }
+    .action-btn.delete { color: #ffb8c7; }
+    .mobile-admin-toggle { display: none; }
+
+    footer {
+      margin-top: 2rem;
+      padding: 2rem 1rem;
+      text-align: center;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+
+    @media (max-width: 1024px) {
+      .desktop-nav { display: none; }
+      .menu-toggle { display: inline-flex; }
+      .mobile-tab-bar { display: flex; }
+      .grid { grid-template-columns: 1fr 1fr; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 860px) {
+      .admin-wrapper { grid-template-columns: 1fr; }
+      .admin-sidebar {
+        display: none;
+        position: fixed;
+        inset: 0 auto 0 0;
+        width: min(88vw, 320px);
+        z-index: 250;
+      }
+      .admin-sidebar.open { display: block; }
+      .mobile-admin-toggle { display: inline-flex; }
+      .form-row, .grid, .stats-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 560px) {
+      header.site-header, .admin-header-bar, .admin-content, main.site-main, footer {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+      .swipe-hint {
+        right: 12px;
+        left: 12px;
+        bottom: 14px;
+        max-width: none;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="notification-wrap" id="notification-wrap"></div>
+
+  <div id="website-mode">
+    <header class="site-header">
+      <a href="#" class="logo" onclick="showWebsiteSection('home'); return false;">
+        <div class="logo-icon" id="site-logo-icon">🛡️</div>
+        <span id="site-logo-text">CyberShield Pro</span>
+      </a>
+
+      <nav class="desktop-nav" id="main-nav"></nav>
+
+      <div class="header-actions">
+        <button class="btn-secondary" id="login-btn" type="button" onclick="openLoginModal()">🔐 Login</button>
+        <button class="btn-primary hidden" id="admin-btn" type="button" onclick="goToAdmin()">⚙️ Admin</button>
+        <button class="btn-secondary hidden" id="logout-btn" type="button" onclick="logout()">🚪 Logout</button>
+        <button class="menu-toggle" type="button" onclick="toggleMobileMenu()">☰</button>
+      </div>
+    </header>
+
+    <div class="mobile-nav-panel" id="mobile-nav-panel">
+      <nav class="mobile-nav" id="mobile-main-nav"></nav>
+    </div>
+
+    <div class="mobile-tab-bar" id="mobile-tab-bar"></div>
+    <div class="swipe-hint">↔️ Swipe or drag to switch pages</div>
+
+    <main class="site-main">
+      <section id="home" class="section">
+        <div class="hero">
+          <h1 id="hero-title">Advanced Cybersecurity Solutions</h1>
+          <p id="hero-desc">Protecting your digital assets with cutting-edge security, visibility, and resilience.</p>
+          <div class="hero-buttons">
+            <button class="btn-primary" type="button" onclick="showWebsiteSection('contact')">Get Started</button>
+            <button class="btn-secondary" type="button" onclick="showWebsiteSection('services')">Explore Services</button>
+          </div>
+          <img id="hero-public-image" class="hero-image hidden" alt="Hero image">
+        </div>
+
+        <h2 class="section-title" id="home-section-title">Why Choose Us?</h2>
+        <p class="section-subtitle" id="home-section-subtitle">Fast response, expert consulting, and measurable protection for growing businesses.</p>
+        <div class="grid" id="why-choose-grid"></div>
+      </section>
+
+      <section id="services" class="section hidden">
+        <h2 class="section-title">Services</h2>
+        <p class="section-subtitle" id="services-page-subtitle">Security services managed completely by the admin panel.</p>
+        <div class="grid" id="services-grid"></div>
+      </section>
+
+      <section id="about" class="section hidden">
+        <h2 class="section-title">About</h2>
+        <div class="card" style="min-height:auto;">
+          <div id="about-text">Since 2009, CyberShield Pro has partnered with organizations of every size to defend what matters most — their data, their systems, and their reputation. What began as a small team of ethical hackers has grown into a full-spectrum cybersecurity practice, combining hands-on penetration testing, continuous vulnerability management, and compliance expertise with a genuinely human approach to client relationships. We don't just hand over a report and walk away; our specialists work alongside your team to translate technical risk into clear, actionable steps, so security becomes a strength your business can build on rather than a box to check. Backed by real-world experience across finance, healthcare, and enterprise environments, CyberShield Pro exists to give you one thing above all: confidence that your digital front line is covered.</div>
+        </div>
+      </section>
+
+      <section id="team-public" class="section hidden">
+        <h2 class="section-title">Our Team</h2>
+        <p class="section-subtitle">Meet the leadership and delivery team behind CyberShield Pro.</p>
+        <div class="grid" id="team-grid"></div>
+      </section>
+
+      <section id="clients" class="section hidden">
+        <h2 class="section-title">Our Clients</h2>
+        <p class="section-subtitle">Trusted by organizations across industries.</p>
+        <div class="grid" id="clients-grid"></div>
+      </section>
+
+      <section id="blog" class="section hidden">
+        <h2 class="section-title" id="blog-page-title">Blog</h2>
+        <p class="section-subtitle" id="blog-page-subtitle">Latest updates managed from the admin panel.</p>
+        <div class="grid" id="blog-grid"></div>
+      </section>
+
+      <section id="gallery" class="section hidden">
+        <h2 class="section-title" id="gallery-page-title">Gallery</h2>
+        <p class="section-subtitle" id="gallery-page-subtitle">Group photos, company images, events, and media uploads.</p>
+        <div class="media-grid" id="public-gallery"></div>
+      </section>
+
+      <section id="general" class="section hidden">
+        <h2 class="section-title">General Information</h2>
+        <p class="section-subtitle">Company details, contact information, and public business overview.</p>
+        <div class="card" style="min-height:auto;">
+          <p id="general-info-text">Update public company details from the admin panel.</p>
+        </div>
+      </section>
+
+      <section id="contact" class="section hidden">
+        <h2 class="section-title">Contact</h2>
+        <div class="panel form-container">
+          <div class="form-title" id="contact-form-title">Contact Us</div>
+          <form id="contact-form">
+            <div class="form-row">
+              <div class="form-group"><label>Full Name</label><input type="text" id="contact-name" required maxlength="120"></div>
+              <div class="form-group"><label>Email</label><input type="email" id="contact-email" required maxlength="160"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>Company</label><input type="text" id="contact-company" maxlength="160"></div>
+              <div class="form-group"><label>Phone</label><input type="text" id="contact-phone" maxlength="50"></div>
+            </div>
+            <div class="form-group"><label>Message</label><textarea id="contact-message" maxlength="1500" required></textarea></div>
+            <button class="btn-primary" type="submit">Send Message</button>
+          </form>
+          <div class="card" id="contact-public-info" style="margin-top:1rem; min-height:auto;"></div>
+        </div>
+      </section>
+
+      <div id="dynamic-sections"></div>
+    </main>
+
+    <div id="login-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span>🔐 Admin Login</span>
+          <button class="modal-close" type="button" onclick="closeModal('login-modal')">✕</button>
+        </div>
+        <div class="form-group"><label>Email</label><input type="email" id="login-email" autocomplete="username"></div>
+        <div class="form-group"><label>Password</label><input type="password" id="login-password" autocomplete="current-password"></div>
+        <div class="form-group" id="login-hint" style="color:var(--muted);"></div>
+        <div class="action-row" style="margin-bottom:1rem;">
+          <button class="btn-ghost" type="button" onclick="resetAdminAccount()">Reset Default Admin</button>
+        </div>
+        <button class="btn-primary" type="button" onclick="handleLogin()">Login</button>
+      </div>
+    </div>
+
+    <footer>
+      <p>&copy; <span id="footer-year"></span> <span id="footer-company">CyberShield Pro</span>. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <div id="admin-mode">
+    <div class="admin-wrapper">
+      <aside class="admin-sidebar" id="admin-sidebar">
+        <div class="admin-brand">
+          <div class="logo-icon">⚙️</div>
+          <div><strong>Advanced Admin</strong><br><small style="color:var(--muted);">Manage pages, content and media</small></div>
+        </div>
+        <div class="admin-nav">
+          <button class="admin-nav-link active" type="button" onclick="switchAdminSection('dashboard', this)">📊 Dashboard</button>
+          <button class="admin-nav-link" type="button" onclick="switchAdminSection('pages', this)">📄 Pages Manager</button>
+          <button class="admin-nav-link" type="button" onclick="switchAdminSection('media', this)">🖼️ Media</button>
+          <button class="admin-nav-link" type="button" onclick="switchAdminSection('services', this)">🎯 Services</button>
+          <button class="admin-nav-link" type="button" onclick="switchAdminSection('team', this)">👔 Team</button>
+          <button class="admin-nav-link" type="button" onclick="switchAdminSection('clients', this)">🤝 Clients</button>
+          <button class="admin-nav-link" type="button" onclick="switchAdminSection('blog', this)">📰 Blog</button>
+          <button class="admin-nav-link" type="button" onclick="switchAdminSection('content', this)">🧩 Core Content</button>
+          <button class="admin-nav-link" type="button" onclick="switchAdminSection('homepage', this)">🏠 Homepage</button>
+          <button class="admin-nav-link" type="button" onclick="switchAdminSection('design', this)">🎨 Design</button>
+          <button class="admin-nav-link" type="button" onclick="switchAdminSection('settings', this)">⚙️ General Settings</button>
+          <button class="admin-nav-link" type="button" onclick="switchAdminSection('security', this)">🔒 Admin Security</button>
+        </div>
+        <div style="display:grid; gap:.6rem; margin-top:1rem;">
+          <button class="btn-secondary" type="button" onclick="goToWebsite()">🌐 View Website</button>
+          <button class="btn-danger" type="button" onclick="exitAdmin()">🚪 Logout</button>
+        </div>
+      </aside>
+
+      <div class="admin-main">
+        <div class="admin-header-bar">
+          <button class="btn-ghost mobile-admin-toggle" type="button" onclick="toggleAdminSidebar()">☰ Menu</button>
+          <div id="admin-section-title" style="font-size:1.5rem; color:var(--primary); font-weight:800;">📊 Dashboard</div>
+          <div id="admin-user-email"></div>
+        </div>
+
+        <div class="admin-content">
+          <section id="admin-dashboard" class="admin-section">
+            <div class="stats-grid">
+              <div class="stat-card"><div class="stat-number" id="stat-pages">0</div><div>Pages</div></div>
+              <div class="stat-card"><div class="stat-number" id="stat-services">0</div><div>Services</div></div>
+              <div class="stat-card"><div class="stat-number" id="stat-team">0</div><div>Team</div></div>
+              <div class="stat-card"><div class="stat-number" id="stat-media">0</div><div>Media</div></div>
+            </div>
+          </section>
+
+          <section id="admin-pages" class="admin-section hidden">
+            <div class="panel admin-form-card">
+              <div class="admin-form-title" id="page-form-title">Create / Edit Page</div>
+              <input type="hidden" id="page-edit-id">
+              <input type="hidden" id="page-image-data">
+              <div class="form-row">
+                <div class="form-group"><label>Page Name</label><input type="text" id="page-name"></div>
+                <div class="form-group"><label>Slug</label><input type="text" id="page-slug"></div>
+              </div>
+              <div class="form-group"><label>Summary</label><input type="text" id="page-summary"></div>
+              <div class="form-group"><label>Content</label><textarea id="page-desc"></textarea></div>
+              <div class="form-group"><label>Page Image</label><input type="file" id="page-image-file" accept="image/*" onchange="handleGenericImageUpload(event, 'page')"></div>
+              <div id="page-image-preview" style="margin-bottom:1rem; color:var(--muted);">No page image selected.</div>
+              <div class="form-row">
+                <div class="form-group"><label>Visible</label><select id="page-visible"><option value="true">Visible</option><option value="false">Hidden</option></select></div>
+                <div class="form-group"><label>Order</label><input type="number" id="page-order" min="1" value="1"></div>
+              </div>
+              <div class="action-row"><button class="btn-primary" type="button" onclick="savePage()">Save Page</button><button class="btn-ghost" type="button" onclick="resetPageForm()">Reset</button></div>
+            </div>
+            <div class="table-container"><div class="table-scroll"><table><thead><tr><th>Name</th><th>Slug</th><th>Visible</th><th>Actions</th></tr></thead><tbody id="pages-list"></tbody></table></div></div>
+          </section>
+
+          <section id="admin-media" class="admin-section hidden">
+            <div class="panel admin-form-card">
+              <div class="admin-form-title">Upload Media</div>
+              <div class="form-row">
+                <div class="form-group"><label>Category</label><select id="media-category"><option value="gallery">Gallery</option><option value="general">General</option><option value="team">Team</option><option value="blog">Blog</option></select></div>
+                <div class="form-group"><label>Title</label><input type="text" id="media-title"></div>
+              </div>
+              <div class="upload-area" onclick="document.getElementById('file-input').click()"><p>📤 Upload image</p><p style="color:var(--muted); margin-top:.5rem;">Gallery images appear on the public Gallery page.</p></div>
+              <input type="file" id="file-input" class="hidden" accept="image/*" onchange="handleImageUpload(event)">
+              <div id="image-preview" style="margin-top:1rem;"></div>
+            </div>
+            <div class="media-grid" id="media-gallery"></div>
+          </section>
+
+          <section id="admin-services" class="admin-section hidden">
+            <div class="panel admin-form-card">
+              <div class="admin-form-title">Service Manager</div>
+              <input type="hidden" id="service-edit-id">
+              <input type="hidden" id="service-image-data">
+              <div class="form-row">
+                <div class="form-group"><label>Icon</label><input type="text" id="service-icon"></div>
+                <div class="form-group"><label>Name</label><input type="text" id="service-name"></div>
+              </div>
+              <div class="form-group"><label>Description</label><textarea id="service-desc"></textarea></div>
+              <div class="form-group"><label>Service Image</label><input type="file" id="service-image-file" accept="image/*" onchange="handleGenericImageUpload(event, 'service')"></div>
+              <div id="service-image-preview" style="margin-bottom:1rem; color:var(--muted);">No service image selected.</div>
+              <div class="action-row"><button class="btn-primary" type="button" onclick="saveService()">Save Service</button><button class="btn-ghost" type="button" onclick="resetServiceForm()">Reset</button></div>
+            </div>
+            <div class="table-container"><div class="table-scroll"><table><thead><tr><th>Icon</th><th>Name</th><th>Description</th><th>Actions</th></tr></thead><tbody id="services-list"></tbody></table></div></div>
+          </section>
+
+          <section id="admin-team" class="admin-section hidden">
+            <div class="panel admin-form-card">
+              <div class="admin-form-title">Team Manager</div>
+              <input type="hidden" id="team-edit-id">
+              <input type="hidden" id="team-image-data">
+              <div class="form-row">
+                <div class="form-group"><label>Icon</label><input type="text" id="team-icon"></div>
+                <div class="form-group"><label>Name</label><input type="text" id="team-name"></div>
+              </div>
+              <div class="form-group"><label>Position / Bio</label><input type="text" id="team-position"></div>
+              <div class="form-group"><label>Profile Picture</label><input type="file" id="team-image-file" accept="image/*" onchange="handleTeamImageUpload(event)"></div>
+              <div id="team-image-preview" class="muted" style="margin-bottom:1rem;"></div>
+              <div class="action-row"><button class="btn-primary" type="button" onclick="saveTeamMember()">Save Member</button><button class="btn-ghost" type="button" onclick="resetTeamForm()">Reset</button></div>
+            </div>
+            <div class="table-container"><div class="table-scroll"><table><thead><tr><th>Photo / Icon</th><th>Name</th><th>Position</th><th>Actions</th></tr></thead><tbody id="team-list"></tbody></table></div></div>
+          </section>
+
+          <section id="admin-clients" class="admin-section hidden">
+            <div class="panel admin-form-card">
+              <div class="admin-form-title">Clients Manager</div>
+              <input type="hidden" id="client-edit-id">
+              <input type="hidden" id="client-image-data">
+              <div class="form-row">
+                <div class="form-group"><label>Client Name</label><input type="text" id="client-name" maxlength="100"></div>
+                <div class="form-group"><label>Industry</label><input type="text" id="client-industry" maxlength="120" placeholder="Finance, Healthcare, Retail"></div>
+              </div>
+              <div class="form-group"><label>Short Description</label><input type="text" id="client-description" maxlength="220" placeholder="Trusted partner for endpoint security"></div>
+              <div class="form-group"><label>Client Logo / Image</label><input type="file" id="client-image-file" accept="image/*" onchange="handleClientImageUpload(event)"></div>
+              <div id="client-image-preview" class="muted" style="margin-bottom:1rem;"></div>
+              <div class="action-row"><button class="btn-primary" type="button" onclick="saveClient()">Save Client</button><button class="btn-ghost" type="button" onclick="resetClientForm()">Reset</button></div>
+            </div>
+            <div class="table-container"><div class="table-scroll"><table><thead><tr><th>Logo</th><th>Name</th><th>Industry</th><th>Description</th><th>Actions</th></tr></thead><tbody id="clients-list"></tbody></table></div></div>
+          </section>
+
+          <section id="admin-blog" class="admin-section hidden">
+            <div class="panel admin-form-card">
+              <div class="admin-form-title">Blog Manager</div>
+              <input type="hidden" id="blog-edit-id">
+              <input type="hidden" id="blog-image-data">
+              <div class="form-group"><label>Title</label><input type="text" id="blog-title"></div>
+              <div class="form-group"><label>Excerpt</label><textarea id="blog-excerpt"></textarea></div>
+              <div class="form-group"><label>Content</label><textarea id="blog-content"></textarea></div>
+              <div class="form-group"><label>Featured Image</label><input type="file" id="blog-image-file" accept="image/*" onchange="handleGenericImageUpload(event, 'blog')"></div>
+              <div id="blog-image-preview" style="margin-bottom:1rem; color:var(--muted);">No featured image selected.</div>
+              <div class="action-row"><button class="btn-primary" type="button" onclick="saveBlogPost()">Save Post</button><button class="btn-ghost" type="button" onclick="resetBlogForm()">Reset</button></div>
+            </div>
+            <div class="table-container"><div class="table-scroll"><table><thead><tr><th>Title</th><th>Excerpt</th><th>Date</th><th>Actions</th></tr></thead><tbody id="blog-list"></tbody></table></div></div>
+          </section>
+
+          <section id="admin-content" class="admin-section hidden">
+            <div class="panel admin-form-card">
+              <div class="admin-form-title">Core Content</div>
+              <div class="form-group"><label>Home Section Title</label><input type="text" id="home-section-heading"></div>
+              <div class="form-group"><label>Home Section Subtitle</label><textarea id="home-section-subtitle-input"></textarea></div>
+
+              <div class="form-row">
+                <div class="form-group"><label>Feature 1 Icon</label><input type="text" id="feature1-icon"></div>
+                <div class="form-group"><label>Feature 1 Title</label><input type="text" id="feature1-title"></div>
+              </div>
+              <div class="form-group"><label>Feature 1 Text</label><textarea id="feature1-text"></textarea></div>
+
+              <div class="form-row">
+                <div class="form-group"><label>Feature 2 Icon</label><input type="text" id="feature2-icon"></div>
+                <div class="form-group"><label>Feature 2 Title</label><input type="text" id="feature2-title"></div>
+              </div>
+              <div class="form-group"><label>Feature 2 Text</label><textarea id="feature2-text"></textarea></div>
+
+              <div class="form-row">
+                <div class="form-group"><label>Feature 3 Icon</label><input type="text" id="feature3-icon"></div>
+                <div class="form-group"><label>Feature 3 Title</label><input type="text" id="feature3-title"></div>
+              </div>
+              <div class="form-group"><label>Feature 3 Text</label><textarea id="feature3-text"></textarea></div>
+
+              <input type="hidden" id="about-image-data">
+              <div class="form-group"><label>About Title</label><input type="text" id="about-page-title"></div>
+              <div class="form-group"><label>About Text</label><textarea id="about-page-text"></textarea></div>
+              <div class="form-group"><label>About Image</label><input type="file" accept="image/*" onchange="handleGenericImageUpload(event, 'about')"></div>
+              <div id="about-image-preview" style="margin-bottom:1rem; color:var(--muted);">No about image selected.</div>
+
+              <div class="form-group"><label>Services Subtitle</label><textarea id="services-page-subtitle-input"></textarea></div>
+
+              <input type="hidden" id="contact-image-data">
+              <div class="form-group"><label>Contact Title</label><input type="text" id="contact-page-title"></div>
+              <div class="form-group"><label>Contact Form Title</label><input type="text" id="contact-form-title-input"></div>
+              <div class="form-group"><label>Contact Intro</label><textarea id="contact-page-text"></textarea></div>
+              <div class="form-row">
+                <div class="form-group"><label>Public Email</label><input type="text" id="contact-public-email"></div>
+                <div class="form-group"><label>Public Phone</label><input type="text" id="contact-public-phone"></div>
+              </div>
+              <div class="form-group"><label>Public Address</label><input type="text" id="contact-public-address"></div>
+              <div class="form-group"><label>Contact Image</label><input type="file" accept="image/*" onchange="handleGenericImageUpload(event, 'contact')"></div>
+              <div id="contact-image-preview" style="margin-bottom:1rem; color:var(--muted);">No contact image selected.</div>
+
+              <div class="form-group"><label>Blog Title</label><input type="text" id="blog-page-title-input"></div>
+              <div class="form-group"><label>Blog Subtitle</label><textarea id="blog-page-subtitle-input"></textarea></div>
+
+              <div class="form-group"><label>Gallery Title</label><input type="text" id="gallery-page-title-input"></div>
+              <div class="form-group"><label>Gallery Subtitle</label><textarea id="gallery-page-subtitle-input"></textarea></div>
+
+              <div class="action-row">
+                <button class="btn-primary" type="button" onclick="saveCoreContent()">Save Core Content</button>
+              </div>
+            </div>
+          </section>
+
+          <section id="admin-homepage" class="admin-section hidden">
+            <div class="panel admin-form-card">
+              <div class="admin-form-title">Homepage</div>
+              <input type="hidden" id="hero-image-data">
+              <div class="form-group"><label>Hero Title</label><input type="text" id="hero-title-input"></div>
+              <div class="form-group"><label>Hero Description</label><textarea id="hero-desc-input"></textarea></div>
+              <div class="form-row">
+                <div class="form-group"><label>Button 1</label><input type="text" id="hero-btn1"></div>
+                <div class="form-group"><label>Button 2</label><input type="text" id="hero-btn2"></div>
+              </div>
+              <div class="form-group"><label>Hero Image</label><input type="file" accept="image/*" onchange="handleGenericImageUpload(event, 'hero')"></div>
+              <div id="hero-image-preview" style="margin-bottom:1rem; color:var(--muted);">No hero image selected.</div>
+              <button class="btn-primary" type="button" onclick="saveHomepage()">Save Homepage</button>
+            </div>
+          </section>
+
+          <section id="admin-design" class="admin-section hidden">
+            <div class="panel admin-form-card">
+              <div class="admin-form-title">Theme</div>
+              <div class="form-row">
+                <div class="form-group"><label>Primary</label><input type="color" id="primary-color" value="#00d9ff"></div>
+                <div class="form-group"><label>Secondary</label><input type="color" id="secondary-color" value="#ff006e"></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label>Accent</label><input type="color" id="accent-color" value="#8338ec"></div>
+                <div class="form-group"><label>Background</label><input type="color" id="bg-color" value="#070c26"></div>
+              </div>
+              <button class="btn-primary" type="button" onclick="applyTheme()">Apply Theme</button>
+            </div>
+          </section>
+
+          <section id="admin-settings" class="admin-section hidden">
+            <div class="panel admin-form-card">
+              <div class="admin-form-title">General Settings</div>
+              <div class="form-row">
+                <div class="form-group"><label>Site Name</label><input type="text" id="site-name"></div>
+                <div class="form-group"><label>Logo Emoji</label><input type="text" id="site-logo"></div>
+              </div>
+              <div class="form-group"><label>Phone</label><input type="text" id="company-phone"></div>
+              <div class="form-group"><label>Email</label><input type="text" id="company-email"></div>
+              <div class="form-group"><label>Address</label><input type="text" id="company-address"></div>
+              <div class="form-group"><label>Website</label><input type="text" id="company-website"></div>
+              <div class="form-group"><label>About Text</label><textarea id="about-textarea"></textarea></div>
+              <button class="btn-primary" type="button" onclick="saveSettings()">Save Settings</button>
+            </div>
+          </section>
+
+          <section id="admin-security" class="admin-section hidden">
+            <div class="panel admin-form-card">
+              <div class="admin-form-title">Admin Security</div>
+              <div class="form-row">
+                <div class="form-group"><label>Admin Email</label><input type="email" id="admin-email-setting"></div>
+                <div class="form-group"><label>New Password</label><input type="password" id="admin-password-setting"></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group"><label>Auto Logout (minutes)</label><input type="number" id="session-timeout" min="1" value="30"></div>
+                <div class="form-group"><label>Max Failed Attempts</label><input type="number" id="max-login-attempts" min="3" value="5"></div>
+              </div>
+              <button class="btn-primary" type="button" onclick="saveSecuritySettings()">Save Security</button>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEYS = {
+      pages: 'csp_pages_v4',
+      services: 'csp_services_v4',
+      team: 'csp_team_v4',
+      clients: 'csp_clients_v4',
+      blog: 'csp_blog_v4',
+      media: 'csp_media_v4',
+      settings: 'csp_settings_v4',
+      homepage: 'csp_homepage_v4',
+      theme: 'csp_theme_v4',
+      auth: 'csp_auth_v4',
+      session: 'csp_session_v4',
+      security: 'csp_security_v4',
+      coreContent: 'csp_core_content_v4'
+    };
+
+    const basePages = [
+      { slug: 'home', title: 'Home' },
+      { slug: 'services', title: 'Services' },
+      { slug: 'about', title: 'About' },
+      { slug: 'team-public', title: 'Team' },
+      { slug: 'clients', title: 'Clients' },
+      { slug: 'blog', title: 'Blog' },
+      { slug: 'gallery', title: 'Gallery' },
+      { slug: 'general', title: 'General' },
+      { slug: 'contact', title: 'Contact' }
+    ];
+
+    const demoServices = [
+      { id: 1, icon: '🕵️', name: 'Penetration Testing', description: 'Advanced security assessments and comprehensive penetration testing to identify vulnerabilities.', image: '' },
+      { id: 2, icon: '🔍', name: 'Vulnerability Assessment', description: 'Comprehensive security scans and detailed vulnerability analysis with remediation guidance.', image: '' },
+      { id: 3, icon: '🛡️', name: 'Security Compliance', description: 'Meet security standards and compliance requirements with expert consulting.', image: '' }
+    ];
+
+    const demoTeam = [
+      { id: 1, icon: '👨‍💼', name: 'Ahmed Khan', position: 'CEO & Founder - Cybersecurity strategy specialist', image: '' },
+      { id: 2, icon: '👩‍💻', name: 'Sarah Ahmed', position: 'CTO - Security architecture and platform lead', image: '' }
+    ];
+
+    const demoClients = [
+      { id: 1, name: 'NorthStar Finance', industry: 'Finance', description: 'Trusted partner for security assessments.', image: '' },
+      { id: 2, name: 'MedSecure Labs', industry: 'Healthcare', description: 'Compliance and infrastructure security support.', image: '' }
+    ];
+
+    const defaultCoreContent = {
+      homeTitle: 'Why Choose Us?',
+      homeSubtitle: 'Fast response, expert consulting, and measurable protection for growing businesses.',
+      features: [
+        { icon: '🎯', title: 'Expert Team', text: 'Experienced security professionals delivering practical, outcome-driven protection.' },
+        { icon: '🔒', title: 'Advanced Protection', text: 'Modern security assessments, monitoring, and layered defense strategies.' },
+        { icon: '📡', title: '24/7 Monitoring', text: 'Continuous visibility, incident readiness, and faster response to risk.' }
+      ],
+      aboutTitle: 'About',
+      aboutText: 'Since 2009, CyberShield Pro has partnered with organizations of every size to defend what matters most — their data, their systems, and their reputation. What began as a small team of ethical hackers has grown into a full-spectrum cybersecurity practice, combining hands-on penetration testing, continuous vulnerability management, and compliance expertise with a genuinely human approach to client relationships. We don\'t just hand over a report and walk away; our specialists work alongside your team to translate technical risk into clear, actionable steps, so security becomes a strength your business can build on rather than a box to check. Backed by real-world experience across finance, healthcare, and enterprise environments, CyberShield Pro exists to give you one thing above all: confidence that your digital front line is covered.',
+      aboutImage: '',
+      servicesSubtitle: 'Security services managed completely by the admin panel.',
+      contactTitle: 'Contact',
+      contactFormTitle: 'Contact Us',
+      contactText: 'Reach out to our team for consultations and cybersecurity services.',
+      publicEmail: 'info@example.com',
+      publicPhone: '+92 300 1234567',
+      publicAddress: '123 Business Street, City',
+      contactImage: '',
+      blogTitle: 'Blog',
+      blogSubtitle: 'Latest updates managed from the admin panel.',
+      galleryTitle: 'Gallery',
+      gallerySubtitle: 'Group photos, company images, events, and media uploads.'
+    };
+
+    let currentUser = null;
+    let allPages = [];
+    let allServices = [];
+    let allTeamMembers = [];
+    let allClients = [];
+    let allBlogPosts = [];
+    let mediaFiles = [];
+    let companySettings = {};
+    let homepageSettings = {};
+    let securitySettings = {};
+    let coreContent = {};
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let dragStartTime = 0;
+    let loginAttempts = 0;
+    let lockoutUntil = 0;
+    let inactivityTimer = null;
+
+    function save(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
+    function load(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch {
+        return fallback;
+      }
+    }
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+    function sanitizeText(value, maxLen = 5000) {
+      return String(value || '').trim().slice(0, maxLen);
+    }
+    function slugify(text) {
+      return String(text || '').toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    }
+    function uid(items) { return Math.max(0, ...items.map(i => Number(i.id) || 0)) + 1; }
+    function getNow() { return Date.now(); }
+
+    function showNotification(message, type = 'info') {
+      const wrap = document.getElementById('notification-wrap');
+      const note = document.createElement('div');
+      note.className = 'notification ' + type;
+      note.textContent = message;
+      wrap.appendChild(note);
+      setTimeout(() => note.remove(), 3200);
+    }
+
+    async function hashPassword(password) {
+      const msgUint8 = new TextEncoder().encode(password);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+      return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function ensureDefaultAdmin() {
+      let auth = load(STORAGE_KEYS.auth, null);
+      if (auth && auth.email && auth.passwordHash) return;
+      const passwordHash = await hashPassword('password123');
+      save(STORAGE_KEYS.auth, { email: 'admin@example.com', passwordHash, role: 'super_admin' });
+    }
+
+    function loadAllData() {
+      allPages = load(STORAGE_KEYS.pages, []);
+      allServices = load(STORAGE_KEYS.services, demoServices);
+      if (!Array.isArray(allServices) || !allServices.length) {
+        allServices = demoServices.slice();
+        save(STORAGE_KEYS.services, allServices);
+      }
+
+      allTeamMembers = load(STORAGE_KEYS.team, demoTeam);
+      if (!Array.isArray(allTeamMembers) || !allTeamMembers.length) {
+        allTeamMembers = demoTeam.slice();
+        save(STORAGE_KEYS.team, allTeamMembers);
+      }
+
+      allClients = load(STORAGE_KEYS.clients, demoClients);
+      if (!Array.isArray(allClients) || !allClients.length) {
+        allClients = demoClients.slice();
+        save(STORAGE_KEYS.clients, allClients);
+      }
+
+      allBlogPosts = load(STORAGE_KEYS.blog, []);
+      mediaFiles = load(STORAGE_KEYS.media, []);
+      companySettings = load(STORAGE_KEYS.settings, {
+        name: 'CyberShield Pro',
+        logo: '🛡️',
+        about: defaultCoreContent.aboutText,
+        // kept in sync with defaultCoreContent.aboutText above
+        phone: '',
+        email: '',
+        address: '',
+        website: ''
+      });
+      homepageSettings = load(STORAGE_KEYS.homepage, {
+        heroTitle: 'Advanced Cybersecurity Solutions',
+        heroDesc: 'Protecting your digital assets with cutting-edge security, visibility, and resilience.',
+        heroBtn1: 'Get Started',
+        heroBtn2: 'Explore Services',
+        heroImage: ''
+      });
+      securitySettings = load(STORAGE_KEYS.security, { timeoutMinutes: 30, maxAttempts: 5 });
+      coreContent = load(STORAGE_KEYS.coreContent, defaultCoreContent);
+    }
+
+    function syncAuthButtons() {
+      const isLoggedIn = !!currentUser;
+      document.getElementById('login-btn').classList.toggle('hidden', isLoggedIn);
+      document.getElementById('admin-btn').classList.toggle('hidden', !isLoggedIn);
+      document.getElementById('logout-btn').classList.toggle('hidden', !isLoggedIn);
+    }
+
+    function openLoginModal() {
+      document.getElementById('login-modal').classList.add('active');
+      const auth = load(STORAGE_KEYS.auth, {});
+      document.getElementById('login-hint').textContent = 'Default admin: ' + (auth.email || 'admin@example.com') + ' / password123';
+    }
+    function closeModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('active');
+    }
+
+    async function handleLogin() {
+      const email = String(document.getElementById('login-email').value || '').trim().toLowerCase();
+      const password = String(document.getElementById('login-password').value || '');
+      let auth = load(STORAGE_KEYS.auth, null);
+      if (!auth || !auth.email) {
+        await ensureDefaultAdmin();
+        auth = load(STORAGE_KEYS.auth, null);
+      }
+      if (getNow() < lockoutUntil) return showNotification('⏳ Too many failed attempts. Please wait.', 'error');
+      if (!email || !password) return showNotification('❌ Enter email and password', 'error');
+      if (!auth) return showNotification('❌ Admin account not found', 'error');
+
+      let ok = false;
+      if (auth.passwordHash) {
+        ok = email === String(auth.email).toLowerCase() && (await hashPassword(password)) === auth.passwordHash;
+      }
+
+      if (ok) {
+        currentUser = { email: auth.email, role: auth.role || 'super_admin', loginAt: getNow() };
+        sessionStorage.setItem(STORAGE_KEYS.session, JSON.stringify(currentUser));
+        loginAttempts = 0;
+        closeModal('login-modal');
+        document.getElementById('login-email').value = '';
+        document.getElementById('login-password').value = '';
+        syncAuthButtons();
+        startInactivityProtection();
+        goToAdmin();
+        showNotification('✅ Login successful', 'success');
+      } else {
+        loginAttempts += 1;
+        if (loginAttempts >= Number(securitySettings.maxAttempts || 5)) {
+          lockoutUntil = getNow() + 2 * 60 * 1000;
+          loginAttempts = 0;
+          showNotification('🔒 Login locked for 2 minutes', 'error');
+        } else {
+          showNotification('❌ Invalid email or password', 'error');
+        }
+      }
+    }
+
+    async function resetAdminAccount() {
+      const passwordHash = await hashPassword('password123');
+      save(STORAGE_KEYS.auth, { email: 'admin@example.com', passwordHash, role: 'super_admin' });
+      document.getElementById('login-email').value = 'admin@example.com';
+      document.getElementById('login-password').value = 'password123';
+      document.getElementById('login-hint').textContent = 'Default admin restored: admin@example.com / password123';
+      showNotification('✅ Default admin restored', 'success');
+    }
+
+    function logout() {
+      currentUser = null;
+      sessionStorage.removeItem(STORAGE_KEYS.session);
+      syncAuthButtons();
+      showNotification('👋 Logged out', 'info');
+    }
+
+    function exitAdmin() {
+      logout();
+      goToWebsite();
+    }
+
+    function goToAdmin() {
+      if (!currentUser) return openLoginModal();
+      document.getElementById('website-mode').style.display = 'none';
+      document.getElementById('admin-mode').style.display = 'block';
+      document.getElementById('admin-user-email').textContent = currentUser.email;
+      loadAdminForms();
+      renderAdmin();
+    }
+
+    function goToWebsite() {
+      document.getElementById('admin-mode').style.display = 'none';
+      document.getElementById('website-mode').style.display = 'block';
+      document.getElementById('admin-sidebar').classList.remove('open');
+    }
+
+    function toggleAdminSidebar() {
+      document.getElementById('admin-sidebar').classList.toggle('open');
+    }
+
+    function toggleMobileMenu() {
+      document.getElementById('mobile-nav-panel').classList.toggle('open');
+    }
+
+    function startInactivityProtection() {
+      clearTimeout(inactivityTimer);
+      const timeoutMs = Math.max(1, Number(securitySettings.timeoutMinutes || 30)) * 60 * 1000;
+      const renew = () => {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(() => {
+          if (currentUser) {
+            logout();
+            goToWebsite();
+            showNotification('🔒 Logged out due to inactivity', 'info');
+          }
+        }, timeoutMs);
+      };
+      ['click','keydown','mousemove','touchstart'].forEach(evt => {
+        document.removeEventListener(evt, renew);
+        document.addEventListener(evt, renew);
+      });
+      renew();
+    }
+
+    function getAllPageSlugs() {
+      const custom = allPages.filter(p => p.visible !== false).sort((a,b) => (a.order||999)-(b.order||999)).map(p => p.slug);
+      return [...basePages.map(p => p.slug), ...custom];
+    }
+
+    function showWebsiteSection(sectionId) {
+      document.querySelectorAll('#website-mode .section').forEach(section => section.classList.add('hidden'));
+      const target = document.getElementById(sectionId);
+      if (target) target.classList.remove('hidden');
+      document.querySelectorAll('#main-nav button, #mobile-main-nav button, #mobile-tab-bar button').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('[data-slug="' + sectionId + '"]').forEach(btn => btn.classList.add('active'));
+      document.getElementById('mobile-nav-panel').classList.remove('open');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function rebuildNavigation() {
+      const mainNav = document.getElementById('main-nav');
+      const mobileNav = document.getElementById('mobile-main-nav');
+      const mobileBar = document.getElementById('mobile-tab-bar');
+      const customPages = allPages
+        .filter(page => page.visible !== false)
+        .sort((a,b) => (a.order||999)-(b.order||999))
+        .map(page => ({ slug: page.slug, title: page.name }));
+
+      const seen = new Set();
+      const pages = [...basePages, ...customPages].filter(p => {
+        if (seen.has(p.slug)) return false;
+        seen.add(p.slug);
+        return true;
+      });
+
+      const fill = (container) => {
+        if (!container) return;
+        container.innerHTML = '';
+        pages.forEach(page => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.textContent = page.title;
+          btn.dataset.slug = page.slug;
+          btn.onclick = () => showWebsiteSection(page.slug);
+          container.appendChild(btn);
+        });
+      };
+      fill(mainNav);
+      fill(mobileNav);
+      fill(mobileBar);
+
+      const current = Array.from(document.querySelectorAll('#website-mode .section')).find(s => !s.classList.contains('hidden'));
+      showWebsiteSection(current ? current.id : 'home');
+    }
+
+    function renderWhyChoose() {
+      document.getElementById('home-section-title').textContent = coreContent.homeTitle || defaultCoreContent.homeTitle;
+      document.getElementById('home-section-subtitle').textContent = coreContent.homeSubtitle || defaultCoreContent.homeSubtitle;
+      const features = coreContent.features || defaultCoreContent.features;
+      document.getElementById('why-choose-grid').innerHTML = features.map(item =>
+        '<div class="card"><div class="card-icon">' + escapeHtml(item.icon) + '</div><h3>' + escapeHtml(item.title) + '</h3><p>' + escapeHtml(item.text) + '</p></div>'
+      ).join('');
+    }
+
+    function renderServices() {
+      document.getElementById('services-page-subtitle').textContent = coreContent.servicesSubtitle || '';
+      document.getElementById('services-grid').innerHTML = allServices.map(service => {
+        const imageHtml = service.image ? '<img class="service-image" src="' + service.image + '" alt="' + escapeHtml(service.name) + '">' : '';
+        return '<div class="card">' + imageHtml + '<div class="card-icon">' + escapeHtml(service.icon) + '</div><h3>' + escapeHtml(service.name) + '</h3><p>' + escapeHtml(service.description) + '</p></div>';
+      }).join('');
+    }
+
+    function renderTeam() {
+      document.getElementById('team-grid').innerHTML = allTeamMembers.map(member => {
+        const media = member.image
+          ? '<img class="team-photo" src="' + member.image + '" alt="' + escapeHtml(member.name) + '">'
+          : '<div class="team-photo-placeholder">' + escapeHtml(member.icon || '👤') + '</div>';
+        return '<div class="card" style="text-align:center; min-height:auto;">' + media + '<h3>' + escapeHtml(member.name) + '</h3><p>' + escapeHtml(member.position) + '</p></div>';
+      }).join('');
+    }
+
+    function renderClients() {
+      const grid = document.getElementById('clients-grid');
+      if (!grid) return;
+      grid.innerHTML = allClients.length ? allClients.map(client => {
+        const media = client.image
+          ? '<img class="client-logo" src="' + client.image + '" alt="' + escapeHtml(client.name) + '">'
+          : '<div class="client-logo-placeholder">🤝</div>';
+        return '<div class="card" style="min-height:auto; text-align:center;">' + media + '<h3>' + escapeHtml(client.name) + '</h3><p><strong>' + escapeHtml(client.industry || 'Client') + '</strong></p><p>' + escapeHtml(client.description || '') + '</p></div>';
+      }).join('') : '<div class="card"><h3>No clients added yet</h3><p>Add clients from the admin panel.</p></div>';
+    }
+
+    function renderBlog() {
+      const grid = document.getElementById('blog-grid');
+      if (!grid) return;
+      document.getElementById('blog-page-title').textContent = coreContent.blogTitle || 'Blog';
+      document.getElementById('blog-page-subtitle').textContent = coreContent.blogSubtitle || '';
+      grid.innerHTML = allBlogPosts.length ? allBlogPosts.map(post => {
+        const imageHtml = post.image ? '<img class="blog-image" src="' + post.image + '" alt="' + escapeHtml(post.title) + '">' : '';
+        return '<div class="card">' + imageHtml + '<h3>' + escapeHtml(post.title) + '</h3><p>' + escapeHtml(post.excerpt) + '</p><p style="margin-top:1rem;color:var(--muted);">' + escapeHtml(post.createdAt || '') + '</p></div>';
+      }).join('') : '<div class="card"><h3>No posts yet</h3><p>Blog posts created in the admin panel will appear here.</p></div>';
+    }
+
+    function renderPublicGallery() {
+      document.getElementById('gallery-page-title').textContent = coreContent.galleryTitle || 'Gallery';
+      document.getElementById('gallery-page-subtitle').textContent = coreContent.gallerySubtitle || '';
+      const items = mediaFiles.filter(item => (item.category || 'gallery') === 'gallery');
+      document.getElementById('public-gallery').innerHTML = items.length ? items.map(media =>
+        '<div class="media-item"><img src="' + media.data + '" alt="' + escapeHtml(media.title || media.name) + '"><div class="media-meta"><strong>' + escapeHtml(media.title || media.name) + '</strong><br>' + escapeHtml(media.uploadedAt || '') + '</div></div>'
+      ).join('') : '<div class="card"><h3>No gallery images yet</h3><p>Upload images in Media and set category to Gallery.</p></div>';
+    }
+
+    function renderDynamicPages() {
+      const wrap = document.getElementById('dynamic-sections');
+      wrap.innerHTML = '';
+      allPages.forEach(page => {
+        const section = document.createElement('section');
+        section.id = page.slug;
+        section.className = 'section hidden';
+        const imageHtml = page.image ? '<img class="page-image" src="' + page.image + '" alt="' + escapeHtml(page.name) + '">' : '';
+        section.innerHTML = '<h2 class="section-title">' + escapeHtml(page.name) + '</h2><p class="section-subtitle">' + escapeHtml(page.summary || '') + '</p><div class="card" style="min-height:auto;">' + imageHtml + '<p>' + escapeHtml(page.desc) + '</p></div>';
+        wrap.appendChild(section);
+      });
+    }
+
+    function applyCompanySettings() {
+      document.getElementById('site-logo-text').textContent = companySettings.name || 'CyberShield Pro';
+      document.getElementById('site-logo-icon').textContent = companySettings.logo || '🛡️';
+      document.getElementById('footer-company').textContent = companySettings.name || 'CyberShield Pro';
+
+      const aboutImageHtml = coreContent.aboutImage ? '<img class="content-image" src="' + coreContent.aboutImage + '" alt="About image">' : '';
+      document.getElementById('about-text').innerHTML = aboutImageHtml + '<p>' + escapeHtml(coreContent.aboutText || companySettings.about || '') + '</p>';
+
+      const generalInfo = [
+        companySettings.about || coreContent.aboutText || '',
+        companySettings.phone ? 'Phone: ' + companySettings.phone : '',
+        companySettings.email ? 'Email: ' + companySettings.email : '',
+        companySettings.address ? 'Address: ' + companySettings.address : '',
+        companySettings.website ? 'Website: ' + companySettings.website : ''
+      ].filter(Boolean);
+      const generalInfoEl = document.getElementById('general-info-text');
+      if (generalInfoEl) generalInfoEl.innerHTML = generalInfo.map(line => escapeHtml(line)).join('<br>');
+
+      const contactLines = [coreContent.contactText, coreContent.publicEmail, coreContent.publicPhone, coreContent.publicAddress].filter(Boolean);
+      const contactImageHtml = coreContent.contactImage ? '<img class="content-image" src="' + coreContent.contactImage + '" alt="Contact image">' : '';
+      document.getElementById('contact-public-info').innerHTML = contactImageHtml + contactLines.map(line => '<p>' + escapeHtml(line) + '</p>').join('');
+
+      document.querySelector('#about .section-title').textContent = coreContent.aboutTitle || 'About';
+      document.querySelector('#contact .section-title').textContent = coreContent.contactTitle || 'Contact';
+      document.getElementById('contact-form-title').textContent = coreContent.contactFormTitle || 'Contact Us';
+      document.title = (companySettings.name || 'CyberShield Pro') + ' - Advanced Admin Panel';
+    }
+
+    function applyHomepage() {
+      document.getElementById('hero-title').textContent = homepageSettings.heroTitle || '';
+      document.getElementById('hero-desc').textContent = homepageSettings.heroDesc || '';
+      const buttons = document.querySelectorAll('.hero-buttons button');
+      if (buttons[0]) buttons[0].textContent = homepageSettings.heroBtn1 || 'Get Started';
+      if (buttons[1]) buttons[1].textContent = homepageSettings.heroBtn2 || 'Explore Services';
+
+      const heroImage = document.getElementById('hero-public-image');
+      if (homepageSettings.heroImage) {
+        heroImage.src = homepageSettings.heroImage;
+        heroImage.classList.remove('hidden');
+      } else {
+        heroImage.classList.add('hidden');
+      }
+    }
+
+    function applyThemeToWebsite() {
+      const theme = load(STORAGE_KEYS.theme, null);
+      if (!theme) return;
+      document.documentElement.style.setProperty('--primary', theme.primary || '#00d9ff');
+      document.documentElement.style.setProperty('--secondary', theme.secondary || '#ff006e');
+      document.documentElement.style.setProperty('--accent', theme.accent || '#8338ec');
+      document.documentElement.style.setProperty('--bg', theme.bg || '#070c26');
+    }
+
+    function renderWebsite() {
+      renderWhyChoose();
+      renderServices();
+      renderTeam();
+      renderClients();
+      renderBlog();
+      renderPublicGallery();
+      renderDynamicPages();
+      applyCompanySettings();
+      applyHomepage();
+      applyThemeToWebsite();
+      rebuildNavigation();
+      document.getElementById('footer-year').textContent = new Date().getFullYear();
+    }
+
+    function updateDashboard() {
+      document.getElementById('stat-pages').textContent = allPages.length;
+      document.getElementById('stat-services').textContent = allServices.length;
+      document.getElementById('stat-team').textContent = allTeamMembers.length;
+      document.getElementById('stat-media').textContent = mediaFiles.length;
+    }
+
+    function switchAdminSection(sectionId, el) {
+      document.querySelectorAll('.admin-section').forEach(section => section.classList.add('hidden'));
+      const target = document.getElementById('admin-' + sectionId);
+      if (target) target.classList.remove('hidden');
+      document.querySelectorAll('.admin-nav-link').forEach(btn => btn.classList.remove('active'));
+      if (el) el.classList.add('active');
+
+      const titles = {
+        dashboard:'📊 Dashboard',
+        pages:'📄 Pages Manager',
+        media:'🖼️ Media',
+        services:'🎯 Services',
+        team:'👔 Team',
+        clients:'🤝 Clients',
+        blog:'📰 Blog',
+        content:'🧩 Core Content',
+        homepage:'🏠 Homepage',
+        design:'🎨 Design',
+        settings:'⚙️ General Settings',
+        security:'🔒 Admin Security'
+      };
+      document.getElementById('admin-section-title').textContent = titles[sectionId] || 'Admin';
+      document.getElementById('admin-sidebar').classList.remove('open');
+    }
+
+    function renderAdmin() {
+      updateDashboard();
+      loadPagesList();
+      loadServicesList();
+      loadTeamList();
+      loadClientsList();
+      loadBlogList();
+      loadMediaGallery();
+    }
+
+    function loadAdminForms() {
+      document.getElementById('hero-title-input').value = homepageSettings.heroTitle || '';
+      document.getElementById('hero-desc-input').value = homepageSettings.heroDesc || '';
+      document.getElementById('hero-btn1').value = homepageSettings.heroBtn1 || 'Get Started';
+      document.getElementById('hero-btn2').value = homepageSettings.heroBtn2 || 'Explore Services';
+      document.getElementById('hero-image-data').value = homepageSettings.heroImage || '';
+      document.getElementById('hero-image-preview').innerHTML = homepageSettings.heroImage ? '<img class="hero-image" src="' + homepageSettings.heroImage + '" alt="Hero preview">' : 'No hero image selected.';
+
+      document.getElementById('site-name').value = companySettings.name || '';
+      document.getElementById('site-logo').value = companySettings.logo || '';
+      document.getElementById('company-phone').value = companySettings.phone || '';
+      document.getElementById('company-email').value = companySettings.email || '';
+      document.getElementById('company-address').value = companySettings.address || '';
+      document.getElementById('company-website').value = companySettings.website || '';
+      document.getElementById('about-textarea').value = companySettings.about || '';
+
+      document.getElementById('home-section-heading').value = coreContent.homeTitle || '';
+      document.getElementById('home-section-subtitle-input').value = coreContent.homeSubtitle || '';
+      const features = coreContent.features || defaultCoreContent.features;
+      document.getElementById('feature1-icon').value = features[0]?.icon || '';
+      document.getElementById('feature1-title').value = features[0]?.title || '';
+      document.getElementById('feature1-text').value = features[0]?.text || '';
+      document.getElementById('feature2-icon').value = features[1]?.icon || '';
+      document.getElementById('feature2-title').value = features[1]?.title || '';
+      document.getElementById('feature2-text').value = features[1]?.text || '';
+      document.getElementById('feature3-icon').value = features[2]?.icon || '';
+      document.getElementById('feature3-title').value = features[2]?.title || '';
+      document.getElementById('feature3-text').value = features[2]?.text || '';
+      document.getElementById('about-page-title').value = coreContent.aboutTitle || '';
+      document.getElementById('about-page-text').value = coreContent.aboutText || '';
+      document.getElementById('about-image-data').value = coreContent.aboutImage || '';
+      document.getElementById('about-image-preview').innerHTML = coreContent.aboutImage ? '<img class="content-image" src="' + coreContent.aboutImage + '" alt="About preview">' : 'No about image selected.';
+      document.getElementById('services-page-subtitle-input').value = coreContent.servicesSubtitle || '';
+      document.getElementById('contact-page-title').value = coreContent.contactTitle || '';
+      document.getElementById('contact-form-title-input').value = coreContent.contactFormTitle || '';
+      document.getElementById('contact-page-text').value = coreContent.contactText || '';
+      document.getElementById('contact-public-email').value = coreContent.publicEmail || '';
+      document.getElementById('contact-public-phone').value = coreContent.publicPhone || '';
+      document.getElementById('contact-public-address').value = coreContent.publicAddress || '';
+      document.getElementById('contact-image-data').value = coreContent.contactImage || '';
+      document.getElementById('contact-image-preview').innerHTML = coreContent.contactImage ? '<img class="content-image" src="' + coreContent.contactImage + '" alt="Contact preview">' : 'No contact image selected.';
+      document.getElementById('blog-page-title-input').value = coreContent.blogTitle || '';
+      document.getElementById('blog-page-subtitle-input').value = coreContent.blogSubtitle || '';
+      document.getElementById('gallery-page-title-input').value = coreContent.galleryTitle || '';
+      document.getElementById('gallery-page-subtitle-input').value = coreContent.gallerySubtitle || '';
+
+      const auth = load(STORAGE_KEYS.auth, {});
+      document.getElementById('admin-email-setting').value = auth.email || '';
+      document.getElementById('session-timeout').value = securitySettings.timeoutMinutes || 30;
+      document.getElementById('max-login-attempts').value = securitySettings.maxAttempts || 5;
+
+      const theme = load(STORAGE_KEYS.theme, {
+        primary:'#00d9ff',
+        secondary:'#ff006e',
+        accent:'#8338ec',
+        bg:'#070c26'
+      });
+      document.getElementById('primary-color').value = theme.primary;
+      document.getElementById('secondary-color').value = theme.secondary;
+      document.getElementById('accent-color').value = theme.accent;
+      document.getElementById('bg-color').value = theme.bg;
+    }
+
+    // Resizes/compresses an image file client-side before it's stored as a data URL.
+    // Keeps aspect ratio, never upscales, and outputs PNG for transparent logos/icons
+    // or JPEG (quality-compressed) for everything else — keeps localStorage usage low
+    // and every uploaded photo consistent in size regardless of the original file.
+    function resizeImage(file, maxWidth, maxHeight, quality = 0.85) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const ratio = Math.min(maxWidth / img.width, maxHeight / img.height, 1);
+            const targetWidth = Math.max(1, Math.round(img.width * ratio));
+            const targetHeight = Math.max(1, Math.round(img.height * ratio));
+            const canvas = document.createElement('canvas');
+            canvas.width = targetWidth;
+            canvas.height = targetHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+            const mime = file.type === 'image/png' || file.type === 'image/gif' ? 'image/png' : 'image/jpeg';
+            resolve(canvas.toDataURL(mime, quality));
+          };
+          img.onerror = () => reject(new Error('Could not read image'));
+          img.src = e.target.result;
+        };
+        reader.onerror = () => reject(new Error('Could not read file'));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function handleGenericImageUpload(event, prefix) {
+      const file = event.target.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) {
+        showNotification('❌ Max file size is 5MB', 'error');
+        return;
+      }
+      try {
+        // Banner-style images (hero/blog/page/service/about/contact) get resized to a wide 1200x800 box
+        const data = await resizeImage(file, 1200, 800, 0.85);
+        const hidden = document.getElementById(prefix + '-image-data');
+        const preview = document.getElementById(prefix + '-image-preview');
+        if (hidden) hidden.value = data;
+        if (preview) {
+          const cls = prefix === 'hero' ? 'hero-image' :
+                      prefix === 'blog' ? 'blog-image' :
+                      prefix === 'service' ? 'service-image' :
+                      prefix === 'page' ? 'page-image' : 'content-image';
+          preview.innerHTML = '<img class="' + cls + '" src="' + data + '" alt="Preview">';
+        }
+        showNotification('✅ Image resized and ready', 'success');
+      } catch (err) {
+        showNotification('❌ Could not process image', 'error');
+      }
+    }
+
+    function resetPageForm() {
+      document.getElementById('page-edit-id').value = '';
+      document.getElementById('page-form-title').textContent = 'Create / Edit Page';
+      document.getElementById('page-name').value = '';
+      document.getElementById('page-slug').value = '';
+      document.getElementById('page-summary').value = '';
+      document.getElementById('page-desc').value = '';
+      document.getElementById('page-visible').value = 'true';
+      document.getElementById('page-order').value = Math.max(1, allPages.length + 1);
+      document.getElementById('page-image-data').value = '';
+      document.getElementById('page-image-preview').innerHTML = 'No page image selected.';
+      const file = document.getElementById('page-image-file');
+      if (file) file.value = '';
+    }
+
+    function savePage() {
+      const editId = Number(document.getElementById('page-edit-id').value || 0);
+      const name = sanitizeText(document.getElementById('page-name').value, 80);
+      const slug = slugify(document.getElementById('page-slug').value || name);
+      const summary = sanitizeText(document.getElementById('page-summary').value, 180);
+      const desc = sanitizeText(document.getElementById('page-desc').value, 5000);
+      const visible = document.getElementById('page-visible').value === 'true';
+      const order = Math.max(1, Number(document.getElementById('page-order').value || allPages.length + 1));
+      const image = document.getElementById('page-image-data').value || '';
+      if (!name || !slug || !desc) return showNotification('❌ Fill all page fields', 'error');
+      if (basePages.some(p => p.slug === slug)) return showNotification('❌ This slug is reserved by a core page', 'error');
+
+      const duplicate = allPages.find(p => p.slug === slug && p.id !== editId);
+      if (duplicate) return showNotification('❌ Slug already exists', 'error');
+
+      if (editId) {
+        const page = allPages.find(p => p.id === editId);
+        if (!page) return;
+        page.name = name;
+        page.slug = slug;
+        page.summary = summary;
+        page.desc = desc;
+        page.image = image;
+        page.visible = visible;
+        page.order = order;
+        page.updatedAt = new Date().toLocaleDateString();
+      } else {
+        allPages.push({ id: uid(allPages), name, slug, summary, desc, image, visible, order, createdAt: new Date().toLocaleDateString() });
+      }
+      save(STORAGE_KEYS.pages, allPages);
+      renderWebsite();
+      loadPagesList();
+      updateDashboard();
+      resetPageForm();
+      showNotification('✅ Page saved', 'success');
+    }
+
+    function editPage(id) {
+      const page = allPages.find(p => p.id === id);
+      if (!page) return;
+      document.getElementById('page-edit-id').value = page.id;
+      document.getElementById('page-form-title').textContent = 'Edit Page';
+      document.getElementById('page-name').value = page.name;
+      document.getElementById('page-slug').value = page.slug;
+      document.getElementById('page-summary').value = page.summary || '';
+      document.getElementById('page-desc').value = page.desc;
+      document.getElementById('page-visible').value = String(page.visible !== false);
+      document.getElementById('page-order').value = page.order || 1;
+      document.getElementById('page-image-data').value = page.image || '';
+      document.getElementById('page-image-preview').innerHTML = page.image ? '<img class="page-image" src="' + page.image + '" alt="Page preview">' : 'No page image selected.';
+    }
+
+    function deletePage(id) {
+      if (!confirm('Delete this page?')) return;
+      allPages = allPages.filter(p => p.id !== id);
+      save(STORAGE_KEYS.pages, allPages);
+      renderWebsite();
+      loadPagesList();
+      updateDashboard();
+      showNotification('✅ Page deleted', 'success');
+    }
+
+    function loadPagesList() {
+      document.getElementById('pages-list').innerHTML = allPages.map(page =>
+        '<tr><td>' + escapeHtml(page.name) + '</td><td>/' + escapeHtml(page.slug) + '</td><td>' + (page.visible !== false ? 'Visible' : 'Hidden') + '</td><td><div class="action-row"><button class="action-btn edit" type="button" onclick="editPage(' + page.id + ')">Edit</button><button class="action-btn delete" type="button" onclick="deletePage(' + page.id + ')">Delete</button></div></td></tr>'
+      ).join('') || '<tr><td colspan="4">No pages found.</td></tr>';
+    }
+
+    function resetServiceForm() {
+      document.getElementById('service-edit-id').value = '';
+      document.getElementById('service-icon').value = '';
+      document.getElementById('service-name').value = '';
+      document.getElementById('service-desc').value = '';
+      document.getElementById('service-image-data').value = '';
+      document.getElementById('service-image-preview').innerHTML = 'No service image selected.';
+      const file = document.getElementById('service-image-file');
+      if (file) file.value = '';
+    }
+
+    function saveService() {
+      const editId = Number(document.getElementById('service-edit-id').value || 0);
+      const item = {
+        icon: sanitizeText(document.getElementById('service-icon').value, 4) || '🛡️',
+        name: sanitizeText(document.getElementById('service-name').value, 100),
+        description: sanitizeText(document.getElementById('service-desc').value, 1200),
+        image: document.getElementById('service-image-data').value || ''
+      };
+      if (!item.name || !item.description) return showNotification('❌ Fill all service fields', 'error');
+
+      if (editId) {
+        const current = allServices.find(s => s.id === editId);
+        if (current) Object.assign(current, item);
+      } else {
+        allServices.push({ id: uid(allServices), ...item });
+      }
+      save(STORAGE_KEYS.services, allServices);
+      renderWebsite();
+      loadServicesList();
+      updateDashboard();
+      resetServiceForm();
+      showNotification('✅ Service saved', 'success');
+    }
+
+    function editService(id) {
+      const item = allServices.find(s => s.id === id);
+      if (!item) return;
+      document.getElementById('service-edit-id').value = item.id;
+      document.getElementById('service-icon').value = item.icon;
+      document.getElementById('service-name').value = item.name;
+      document.getElementById('service-desc').value = item.description;
+      document.getElementById('service-image-data').value = item.image || '';
+      document.getElementById('service-image-preview').innerHTML = item.image ? '<img class="service-image" src="' + item.image + '" alt="Service preview">' : 'No service image selected.';
+    }
+
+    function deleteService(id) {
+      if (!confirm('Delete this service?')) return;
+      allServices = allServices.filter(s => s.id !== id);
+      save(STORAGE_KEYS.services, allServices);
+      renderWebsite();
+      loadServicesList();
+      updateDashboard();
+      showNotification('✅ Service deleted', 'success');
+    }
+
+    function loadServicesList() {
+      document.getElementById('services-list').innerHTML = allServices.map(item =>
+        '<tr><td>' + escapeHtml(item.icon) + '</td><td>' + escapeHtml(item.name) + '</td><td>' + escapeHtml(item.description) + '</td><td><div class="action-row"><button class="action-btn edit" type="button" onclick="editService(' + item.id + ')">Edit</button><button class="action-btn delete" type="button" onclick="deleteService(' + item.id + ')">Delete</button></div></td></tr>'
+      ).join('');
+    }
+
+    async function handleTeamImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) {
+        showNotification('❌ Team image max size is 5MB', 'error');
+        return;
+      }
+      try {
+        // Profile photos resized to a 500x500 box, good enough quality for card thumbnails
+        const data = await resizeImage(file, 500, 500, 0.85);
+        document.getElementById('team-image-data').value = data;
+        const preview = document.getElementById('team-image-preview');
+        if (preview) preview.innerHTML = '<img class="team-photo" src="' + data + '" alt="Team preview">';
+        showNotification('✅ Photo resized and ready', 'success');
+      } catch (err) {
+        showNotification('❌ Could not process image', 'error');
+      }
+    }
+
+    function resetTeamForm() {
+      document.getElementById('team-edit-id').value = '';
+      document.getElementById('team-icon').value = '';
+      document.getElementById('team-name').value = '';
+      document.getElementById('team-position').value = '';
+      document.getElementById('team-image-data').value = '';
+      const preview = document.getElementById('team-image-preview');
+      if (preview) preview.innerHTML = '';
+      const fileInput = document.getElementById('team-image-file');
+      if (fileInput) fileInput.value = '';
+    }
+
+    function saveTeamMember() {
+      const editId = Number(document.getElementById('team-edit-id').value || 0);
+      const item = {
+        icon: sanitizeText(document.getElementById('team-icon').value, 4) || '👤',
+        name: sanitizeText(document.getElementById('team-name').value, 100),
+        position: sanitizeText(document.getElementById('team-position').value, 220),
+        image: document.getElementById('team-image-data').value || ''
+      };
+      if (!item.name || !item.position) return showNotification('❌ Fill all team fields', 'error');
+
+      if (editId) {
+        const current = allTeamMembers.find(m => m.id === editId);
+        if (current) Object.assign(current, item);
+      } else {
+        allTeamMembers.push({ id: uid(allTeamMembers), ...item });
+      }
+      save(STORAGE_KEYS.team, allTeamMembers);
+      renderWebsite();
+      loadTeamList();
+      updateDashboard();
+      resetTeamForm();
+      showNotification('✅ Team member saved', 'success');
+    }
+
+    function editTeamMember(id) {
+      const item = allTeamMembers.find(m => m.id === id);
+      if (!item) return;
+      document.getElementById('team-edit-id').value = item.id;
+      document.getElementById('team-icon').value = item.icon;
+      document.getElementById('team-name').value = item.name;
+      document.getElementById('team-position').value = item.position;
+      document.getElementById('team-image-data').value = item.image || '';
+      const preview = document.getElementById('team-image-preview');
+      if (preview) preview.innerHTML = item.image ? '<img class="team-photo" src="' + item.image + '" alt="' + escapeHtml(item.name) + '">' : '';
+    }
+
+    function deleteTeamMember(id) {
+      if (!confirm('Delete this member?')) return;
+      allTeamMembers = allTeamMembers.filter(m => m.id !== id);
+      save(STORAGE_KEYS.team, allTeamMembers);
+      renderWebsite();
+      loadTeamList();
+      updateDashboard();
+      showNotification('✅ Team member deleted', 'success');
+    }
+
+    function loadTeamList() {
+      const list = document.getElementById('team-list');
+      if (!list) return;
+      list.innerHTML = allTeamMembers.map(item => {
+        const thumb = item.image
+          ? '<img src="' + item.image + '" alt="' + escapeHtml(item.name) + '" style="width:52px;height:52px;object-fit:cover;border-radius:10px;border:1px solid var(--border);">'
+          : escapeHtml(item.icon || '👤');
+        return '<tr><td>' + thumb + '</td><td>' + escapeHtml(item.name) + '</td><td>' + escapeHtml(item.position) + '</td><td><div class="action-row"><button class="action-btn edit" type="button" onclick="editTeamMember(' + item.id + ')">Edit</button><button class="action-btn delete" type="button" onclick="deleteTeamMember(' + item.id + ')">Delete</button></div></td></tr>';
+      }).join('') || '<tr><td colspan="4" class="muted">No team members found.</td></tr>';
+    }
+
+    async function handleClientImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) {
+        showNotification('❌ Client image max size is 5MB', 'error');
+        return;
+      }
+      try {
+        // Client logos resized to 500x300 box, PNG kept for transparent logos
+        const data = await resizeImage(file, 500, 300, 0.9);
+        document.getElementById('client-image-data').value = data;
+        const preview = document.getElementById('client-image-preview');
+        if (preview) preview.innerHTML = '<img class="client-logo" src="' + data + '" alt="Client preview">';
+        showNotification('✅ Logo resized and ready', 'success');
+      } catch (err) {
+        showNotification('❌ Could not process image', 'error');
+      }
+    }
+
+    function resetClientForm() {
+      document.getElementById('client-edit-id').value = '';
+      document.getElementById('client-name').value = '';
+      document.getElementById('client-industry').value = '';
+      document.getElementById('client-description').value = '';
+      document.getElementById('client-image-data').value = '';
+      const preview = document.getElementById('client-image-preview');
+      if (preview) preview.innerHTML = '';
+      const fileInput = document.getElementById('client-image-file');
+      if (fileInput) fileInput.value = '';
+    }
+
+    function saveClient() {
+      const editId = Number(document.getElementById('client-edit-id').value || 0);
+      const item = {
+        name: sanitizeText(document.getElementById('client-name').value, 100),
+        industry: sanitizeText(document.getElementById('client-industry').value, 120),
+        description: sanitizeText(document.getElementById('client-description').value, 220),
+        image: document.getElementById('client-image-data').value || ''
+      };
+      if (!item.name) return showNotification('❌ Client name is required', 'error');
+
+      if (editId) {
+        const current = allClients.find(c => c.id === editId);
+        if (current) Object.assign(current, item);
+      } else {
+        allClients.push({ id: uid(allClients), ...item });
+      }
+      save(STORAGE_KEYS.clients, allClients);
+      renderWebsite();
+      loadClientsList();
+      resetClientForm();
+      showNotification('✅ Client saved', 'success');
+    }
+
+    function editClient(id) {
+      const item = allClients.find(c => c.id === id);
+      if (!item) return;
+      document.getElementById('client-edit-id').value = item.id;
+      document.getElementById('client-name').value = item.name;
+      document.getElementById('client-industry').value = item.industry || '';
+      document.getElementById('client-description').value = item.description || '';
+      document.getElementById('client-image-data').value = item.image || '';
+      const preview = document.getElementById('client-image-preview');
+      if (preview) preview.innerHTML = item.image ? '<img class="client-logo" src="' + item.image + '" alt="' + escapeHtml(item.name) + '">' : '';
+    }
+
+    function deleteClient(id) {
+      if (!confirm('Delete this client?')) return;
+      allClients = allClients.filter(c => c.id !== id);
+      save(STORAGE_KEYS.clients, allClients);
+      renderWebsite();
+      loadClientsList();
+      showNotification('✅ Client deleted', 'success');
+    }
+
+    function loadClientsList() {
+      const list = document.getElementById('clients-list');
+      if (!list) return;
+      list.innerHTML = allClients.map(item => {
+        const thumb = item.image
+          ? '<img src="' + item.image + '" alt="' + escapeHtml(item.name) + '" style="width:52px;height:52px;object-fit:cover;border-radius:10px;border:1px solid var(--border);">'
+          : '🤝';
+        return '<tr><td>' + thumb + '</td><td>' + escapeHtml(item.name) + '</td><td>' + escapeHtml(item.industry || '-') + '</td><td>' + escapeHtml(item.description || '-') + '</td><td><div class="action-row"><button class="action-btn edit" type="button" onclick="editClient(' + item.id + ')">Edit</button><button class="action-btn delete" type="button" onclick="deleteClient(' + item.id + ')">Delete</button></div></td></tr>';
+      }).join('') || '<tr><td colspan="5" class="muted">No clients found.</td></tr>';
+    }
+
+    function resetBlogForm() {
+      document.getElementById('blog-edit-id').value = '';
+      document.getElementById('blog-title').value = '';
+      document.getElementById('blog-excerpt').value = '';
+      document.getElementById('blog-content').value = '';
+      document.getElementById('blog-image-data').value = '';
+      document.getElementById('blog-image-preview').innerHTML = 'No featured image selected.';
+      const file = document.getElementById('blog-image-file');
+      if (file) file.value = '';
+    }
+
+    function saveBlogPost() {
+      const editId = Number(document.getElementById('blog-edit-id').value || 0);
+      const item = {
+        title: sanitizeText(document.getElementById('blog-title').value, 150),
+        excerpt: sanitizeText(document.getElementById('blog-excerpt').value, 300),
+        content: sanitizeText(document.getElementById('blog-content').value, 5000),
+        image: document.getElementById('blog-image-data').value || '',
+        createdAt: new Date().toLocaleDateString()
+      };
+      if (!item.title || !item.excerpt || !item.content) return showNotification('❌ Fill all blog fields', 'error');
+
+      if (editId) {
+        const current = allBlogPosts.find(p => p.id === editId);
+        if (current) Object.assign(current, item);
+      } else {
+        allBlogPosts.push({ id: uid(allBlogPosts), ...item });
+      }
+      save(STORAGE_KEYS.blog, allBlogPosts);
+      renderWebsite();
+      loadBlogList();
+      resetBlogForm();
+      showNotification('✅ Blog post saved', 'success');
+    }
+
+    function editBlogPost(id) {
+      const item = allBlogPosts.find(p => p.id === id);
+      if (!item) return;
+      document.getElementById('blog-edit-id').value = item.id;
+      document.getElementById('blog-title').value = item.title;
+      document.getElementById('blog-excerpt').value = item.excerpt;
+      document.getElementById('blog-content').value = item.content;
+      document.getElementById('blog-image-data').value = item.image || '';
+      document.getElementById('blog-image-preview').innerHTML = item.image ? '<img class="blog-image" src="' + item.image + '" alt="Blog preview">' : 'No featured image selected.';
+    }
+
+    function deleteBlogPost(id) {
+      if (!confirm('Delete this post?')) return;
+      allBlogPosts = allBlogPosts.filter(p => p.id !== id);
+      save(STORAGE_KEYS.blog, allBlogPosts);
+      renderWebsite();
+      loadBlogList();
+      showNotification('✅ Post deleted', 'success');
+    }
+
+    function loadBlogList() {
+      document.getElementById('blog-list').innerHTML = allBlogPosts.map(item =>
+        '<tr><td>' + escapeHtml(item.title) + '</td><td>' + escapeHtml(item.excerpt) + '</td><td>' + escapeHtml(item.createdAt || '-') + '</td><td><div class="action-row"><button class="action-btn edit" type="button" onclick="editBlogPost(' + item.id + ')">Edit</button><button class="action-btn delete" type="button" onclick="deleteBlogPost(' + item.id + ')">Delete</button></div></td></tr>'
+      ).join('') || '<tr><td colspan="4" class="muted">No blog posts found.</td></tr>';
+    }
+
+    async function handleImageUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  if (file.size > 5 * 1024 * 1024) {
+    showNotification('❌ Max file size is 5MB', 'error');
+    return;
+  }
+
+  const category = document.getElementById('media-category').value || 'gallery';
+  const title = sanitizeText(document.getElementById('media-title').value || file.name, 120);
+
+  try {
+    // Gallery photos resized to a 1200x900 box, keeps localStorage usage reasonable
+    const data = await resizeImage(file, 1200, 900, 0.85);
+
+    const newMedia = {
+      id: uid(mediaFiles),
+      name: sanitizeText(file.name, 120),
+      title: title,
+      category: category,
+      data: data,
+      uploadedAt: new Date().toLocaleDateString()
+    };
+
+    mediaFiles.push(newMedia);
+
+    save(STORAGE_KEYS.media, mediaFiles);
+
+    document.getElementById('image-preview').innerHTML =
+      '<img src="' + data + '" style="width:100%;max-width:300px;border-radius:12px;border:1px solid var(--border)">';
+
+    document.getElementById('media-title').value = '';
+
+    loadMediaGallery();
+    renderPublicGallery();
+    updateDashboard();
+
+    showNotification('✅ Image resized and uploaded successfully', 'success');
+  } catch (err) {
+    showNotification('❌ Could not process image', 'error');
+  }
+}
+
+    function deleteMedia(id) {
+      if (!confirm('Delete this image?')) return;
+      mediaFiles = mediaFiles.filter(m => m.id !== id);
+      save(STORAGE_KEYS.media, mediaFiles);
+      renderWebsite();
+      loadMediaGallery();
+      updateDashboard();
+      showNotification('✅ Media deleted', 'success');
+    }
+
+    function loadMediaGallery() {
+
+  const gallery = document.getElementById('media-gallery');
+
+  if (!gallery) return;
+
+  if (!mediaFiles.length) {
+    gallery.innerHTML = '<div class="card">No media uploaded yet.</div>';
+    return;
+  }
+
+  gallery.innerHTML = mediaFiles.map(media => `
+    <div class="media-item">
+      <img src="${media.data}" alt="${escapeHtml(media.title || media.name)}">
+
+      <button class="btn-danger media-delete"
+        onclick="deleteMedia(${media.id})">✕</button>
+
+      <div class="media-meta">
+        <strong>${escapeHtml(media.title || media.name)}</strong><br>
+        ${escapeHtml(media.category || 'gallery')} •
+        ${escapeHtml(media.uploadedAt)}
+      </div>
+    </div>
+  `).join('');
+
+}
+
+    function saveCoreContent() {
+      coreContent.homeTitle = sanitizeText(document.getElementById('home-section-heading').value, 120);
+      coreContent.homeSubtitle = sanitizeText(document.getElementById('home-section-subtitle-input').value, 500);
+      coreContent.features = [
+        { icon: sanitizeText(document.getElementById('feature1-icon').value, 4) || '🎯', title: sanitizeText(document.getElementById('feature1-title').value, 120), text: sanitizeText(document.getElementById('feature1-text').value, 500) },
+        { icon: sanitizeText(document.getElementById('feature2-icon').value, 4) || '🔒', title: sanitizeText(document.getElementById('feature2-title').value, 120), text: sanitizeText(document.getElementById('feature2-text').value, 500) },
+        { icon: sanitizeText(document.getElementById('feature3-icon').value, 4) || '📡', title: sanitizeText(document.getElementById('feature3-title').value, 120), text: sanitizeText(document.getElementById('feature3-text').value, 500) }
+      ];
+      coreContent.aboutTitle = sanitizeText(document.getElementById('about-page-title').value, 120);
+      coreContent.aboutText = sanitizeText(document.getElementById('about-page-text').value, 2000);
+      coreContent.aboutImage = document.getElementById('about-image-data').value || '';
+      coreContent.servicesSubtitle = sanitizeText(document.getElementById('services-page-subtitle-input').value, 500);
+      coreContent.contactTitle = sanitizeText(document.getElementById('contact-page-title').value, 120);
+      coreContent.contactFormTitle = sanitizeText(document.getElementById('contact-form-title-input').value, 120);
+      coreContent.contactText = sanitizeText(document.getElementById('contact-page-text').value, 600);
+      coreContent.publicEmail = sanitizeText(document.getElementById('contact-public-email').value, 160);
+      coreContent.publicPhone = sanitizeText(document.getElementById('contact-public-phone').value, 60);
+      coreContent.publicAddress = sanitizeText(document.getElementById('contact-public-address').value, 220);
+      coreContent.contactImage = document.getElementById('contact-image-data').value || '';
+      coreContent.blogTitle = sanitizeText(document.getElementById('blog-page-title-input').value, 120);
+      coreContent.blogSubtitle = sanitizeText(document.getElementById('blog-page-subtitle-input').value, 500);
+      coreContent.galleryTitle = sanitizeText(document.getElementById('gallery-page-title-input').value, 120);
+      coreContent.gallerySubtitle = sanitizeText(document.getElementById('gallery-page-subtitle-input').value, 500);
+      save(STORAGE_KEYS.coreContent, coreContent);
+      renderWebsite();
+      showNotification('✅ Core content saved', 'success');
+    }
+
+    function saveHomepage() {
+      homepageSettings = {
+        heroTitle: sanitizeText(document.getElementById('hero-title-input').value, 140),
+        heroDesc: sanitizeText(document.getElementById('hero-desc-input').value, 800),
+        heroBtn1: sanitizeText(document.getElementById('hero-btn1').value, 40),
+        heroBtn2: sanitizeText(document.getElementById('hero-btn2').value, 40),
+        heroImage: document.getElementById('hero-image-data').value || ''
+      };
+      save(STORAGE_KEYS.homepage, homepageSettings);
+      renderWebsite();
+      showNotification('✅ Homepage updated', 'success');
+    }
+
+    function saveSettings() {
+      companySettings = {
+        name: sanitizeText(document.getElementById('site-name').value, 120),
+        logo: sanitizeText(document.getElementById('site-logo').value, 4),
+        phone: sanitizeText(document.getElementById('company-phone').value, 60),
+        email: sanitizeText(document.getElementById('company-email').value, 160),
+        address: sanitizeText(document.getElementById('company-address').value, 220),
+        website: sanitizeText(document.getElementById('company-website').value, 220),
+        about: sanitizeText(document.getElementById('about-textarea').value, 1600)
+      };
+      save(STORAGE_KEYS.settings, companySettings);
+      renderWebsite();
+      showNotification('✅ Settings saved', 'success');
+    }
+
+    function applyTheme() {
+      const theme = {
+        primary: document.getElementById('primary-color').value,
+        secondary: document.getElementById('secondary-color').value,
+        accent: document.getElementById('accent-color').value,
+        bg: document.getElementById('bg-color').value
+      };
+      save(STORAGE_KEYS.theme, theme);
+      applyThemeToWebsite();
+      showNotification('✅ Theme applied', 'success');
+    }
+
+    async function saveSecuritySettings() {
+      const auth = load(STORAGE_KEYS.auth, {});
+      securitySettings = {
+        timeoutMinutes: Math.max(1, Number(document.getElementById('session-timeout').value || 30)),
+        maxAttempts: Math.max(3, Number(document.getElementById('max-login-attempts').value || 5))
+      };
+      save(STORAGE_KEYS.security, securitySettings);
+      const nextAuth = {
+        email: sanitizeText(document.getElementById('admin-email-setting').value, 160).toLowerCase() || auth.email || 'admin@example.com',
+        role: auth.role || 'super_admin'
+      };
+      const password = String(document.getElementById('admin-password-setting').value || '');
+      nextAuth.passwordHash = password ? await hashPassword(password) : (auth.passwordHash || await hashPassword('password123'));
+      save(STORAGE_KEYS.auth, nextAuth);
+      document.getElementById('admin-password-setting').value = '';
+      showNotification('✅ Security settings saved', 'success');
+    }
+
+    function handleContactForm(event) {
+      event.preventDefault();
+      showNotification('✅ Message captured. Connect backend/email API to send it for real.', 'success');
+      event.target.reset();
+    }
+
+    function bindSwipeNavigation() {
+      document.addEventListener('mousedown', e => {
+        if (document.getElementById('admin-mode').style.display !== 'none') return;
+        touchStartX = e.clientX;
+        touchStartY = e.clientY;
+        dragStartTime = getNow();
+      });
+      document.addEventListener('mouseup', e => {
+        if (document.getElementById('admin-mode').style.display !== 'none') return;
+        const dx = e.clientX - touchStartX;
+        const dy = e.clientY - touchStartY;
+        const dt = getNow() - dragStartTime;
+        if (Math.abs(dx) > 100 && Math.abs(dx) > Math.abs(dy) && dt < 1200) navigatePages(dx < 0 ? 'next' : 'prev');
+      });
+      document.addEventListener('touchstart', e => {
+        if (document.getElementById('admin-mode').style.display !== 'none') return;
+        touchStartX = e.changedTouches[0].clientX;
+        touchStartY = e.changedTouches[0].clientY;
+        dragStartTime = getNow();
+      });
+      document.addEventListener('touchend', e => {
+        if (document.getElementById('admin-mode').style.display !== 'none') return;
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        const dy = e.changedTouches[0].clientY - touchStartY;
+        const dt = getNow() - dragStartTime;
+        if (Math.abs(dx) > 100 && Math.abs(dx) > Math.abs(dy) && dt < 1200) navigatePages(dx < 0 ? 'next' : 'prev');
+      });
+    }
+
+    function navigatePages(direction) {
+      const slugs = getAllPageSlugs();
+      const current = Array.from(document.querySelectorAll('#website-mode .section')).find(s => !s.classList.contains('hidden'));
+      const currentId = current ? current.id : 'home';
+      const index = slugs.indexOf(currentId);
+      if (index < 0) return;
+      const nextIndex = direction === 'next' ? (index + 1) % slugs.length : (index - 1 + slugs.length) % slugs.length;
+      showWebsiteSection(slugs[nextIndex]);
+    }
+
+    function loadSessionUser() {
+      try {
+        return JSON.parse(sessionStorage.getItem(STORAGE_KEYS.session) || 'null');
+      } catch {
+        return null;
+      }
+    }
+
+    async function init() {
+      await ensureDefaultAdmin();
+      loadAllData();
+      currentUser = loadSessionUser();
+      renderWebsite();
+      syncAuthButtons();
+      bindSwipeNavigation();
+      document.getElementById('contact-form').addEventListener('submit', handleContactForm);
+      if (currentUser) startInactivityProtection();
+      resetPageForm();
+      resetServiceForm();
+      resetTeamForm();
+      resetClientForm();
+      resetBlogForm();
+    }
+
+    window.addEventListener('load', init);
+    window.addEventListener('click', e => {
+      if (e.target && e.target.id === 'login-modal') closeModal('login-modal');
+    });
+
+    window.openLoginModal = openLoginModal;
+    window.handleLogin = handleLogin;
+    window.closeModal = closeModal;
+    window.showWebsiteSection = showWebsiteSection;
+    window.toggleMobileMenu = toggleMobileMenu;
+    window.goToAdmin = goToAdmin;
+    window.logout = logout;
+    window.switchAdminSection = switchAdminSection;
+    window.savePage = savePage;
+    window.editPage = editPage;
+    window.deletePage = deletePage;
+    window.resetPageForm = resetPageForm;
+    window.saveService = saveService;
+    window.editService = editService;
+    window.deleteService = deleteService;
+    window.resetServiceForm = resetServiceForm;
+    window.saveTeamMember = saveTeamMember;
+    window.editTeamMember = editTeamMember;
+    window.deleteTeamMember = deleteTeamMember;
+    window.resetTeamForm = resetTeamForm;
+    window.handleTeamImageUpload = handleTeamImageUpload;
+    window.saveClient = saveClient;
+    window.editClient = editClient;
+    window.deleteClient = deleteClient;
+    window.resetClientForm = resetClientForm;
+    window.handleClientImageUpload = handleClientImageUpload;
+    window.saveBlogPost = saveBlogPost;
+    window.editBlogPost = editBlogPost;
+    window.deleteBlogPost = deleteBlogPost;
+    window.resetBlogForm = resetBlogForm;
+    window.handleImageUpload = handleImageUpload;
+    window.deleteMedia = deleteMedia;
+    window.saveCoreContent = saveCoreContent;
+    window.saveHomepage = saveHomepage;
+    window.saveSettings = saveSettings;
+    window.applyTheme = applyTheme;
+    window.saveSecuritySettings = saveSecuritySettings;
+    window.resetAdminAccount = resetAdminAccount;
+    window.goToWebsite = goToWebsite;
+    window.exitAdmin = exitAdmin;
+    window.toggleAdminSidebar = toggleAdminSidebar;
+    window.handleGenericImageUpload = handleGenericImageUpload;
+  </script>
+</body>
+</html>
